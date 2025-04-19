@@ -1,0 +1,88 @@
+services:
+  web:
+    container_name: aldis-api
+    image: aldis-api:latest
+    build:
+      context: .
+      args:
+        user: developer
+        uid: 1000
+    env_file:
+      - .env
+    # ports:
+    #   - "8000:80"
+    volumes:
+      - .:/var/www
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - aldis-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-aldis-api
+    restart: unless-stopped
+    ports:
+      - 8000:80
+      - 443:443
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - .:/var/www:delegated
+    depends_on:
+      - web
+    networks:
+      - aldis-network
+
+  db:
+    container_name: aldis_db
+    image: postgres
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+    networks:
+      - aldis-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: aldis_pgadmin4_container
+    restart: always
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PG_ADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PG_ADMIN_PASSWORD}
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - aldis-network
+
+  redis:
+    image: "redis:alpine"
+    container_name: ri-rifive-redis
+    restart: unless-stopped
+    volumes:
+        - ./docker-compose/redis/data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - aldis-network
+
+networks:
+  aldis-network:
+    driver: bridge
+
+volumes:
+    pgdata:
+    pgadmin-data:
