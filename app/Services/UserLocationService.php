@@ -27,7 +27,8 @@ class UserLocationService implements UserLocationInterface{
         $userLocationsQuery->orderBy('created_at', 'desc');
         if($request->has('size')){
             $size = $request->input('size');
-            $result = $userLocationsQuery->cursorPaginate($size);
+            $cursor = $request->query("cursor");
+            $result = $userLocationsQuery->cursorPaginate($size, ['*'], 'cursor', $cursor);
             return PaginationHelper::cursorPaginated($result);
         }
 

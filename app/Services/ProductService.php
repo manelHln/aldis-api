@@ -171,7 +171,8 @@ class ProductService implements ProductInterface
 
         if ($request->query('size')) {
             $size = $request->query('size', 20);
-            $result = $query->cursorPaginate($size);
+            $cursor = $request->query("cursor");
+            $result = $query->cursorPaginate($size, ['*'], 'cursor', $cursor);
             return PaginationHelper::cursorPaginated($result);
         }
 

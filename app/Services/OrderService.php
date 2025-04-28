@@ -108,7 +108,8 @@ class OrderService implements OrderInterface
         }
         if ($request->has('size')) {
             $size = $request->input('size');
-            $result = $query->where('user_id', $user->id)->with(['products.product'])->cursorPaginate($size);
+            $cursor = $request->query("cursor");
+            $result = $query->where('user_id', $user->id)->with(['products.product'])->cursorPaginate($size, ["*"], "cursor", $cursor);
             return PaginationHelper::cursorPaginated($result);
         }
 
@@ -131,7 +132,8 @@ class OrderService implements OrderInterface
         }
         if ($request->has('size')) {
             $size = $request->input('size');
-            $result = $query->where('user_id', $user->id)->with(['products.product'])->cursorPaginate($size);
+            $cursor = $request->query("cursor");
+            $result = $query->where('user_id', $user->id)->with(['products.product'])->cursorPaginate($size, ["*"], "cursor", $cursor);
             return PaginationHelper::cursorPaginated($result);
         }
 

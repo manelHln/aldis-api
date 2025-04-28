@@ -17,8 +17,8 @@ class RolesService implements RolesInterface
 
         if ($request->has('size')) {
             $size = $request->input('size');
-            $result = $query->cursorPaginate($size);
-
+            $cursor = $request->query("cursor");
+            $result = $query->cursorPaginate($size, ['*'], 'cursor', $cursor);
             return PaginationHelper::cursorPaginated($result);
         }
 

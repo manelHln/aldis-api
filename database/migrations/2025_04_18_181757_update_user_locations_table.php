@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table("user_locations", function (Blueprint $table) {
-            $table->decimal('lat', 10, 8);
-            $table->decimal('long', 11, 8);
+            $table->decimal('lat', 10, 8)->change();
+            $table->decimal('long', 11, 8)->change();
         });
     }
 
